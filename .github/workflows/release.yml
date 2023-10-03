@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - beta
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      version: ${{ steps.semantic.outputs.release-version }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+
+      - name: Set up cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Tag
+        uses: codfish/semantic-release-action@v2.1.0
+        id: semantic
+        with:
+          branches: |
+            [
+              'main',
+              {
+                name: 'beta',
+                prerelease: 'rc'
+              },
+            ]
+          tag_format: "v${version}"
+          additional_packages: |
+            ['@semantic-release/commit-analyzer']
+          plugins: |
+            ['@semantic-release/commit-analyzer']
+
+      - name: Go List
+        if: steps.semantic.outputs.new-release-published == 'true'
+        run: GOPROXY=proxy.golang.org go list -m github.com/pokt-foundation/dwh-client@v${{ steps.semantic.outputs.release-version }}
