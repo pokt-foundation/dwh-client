@@ -20,6 +20,7 @@ var (
 	ErrUnauthorized      = errors.New("unauthorized access")
 	ErrNotFound          = errors.New("resource not found")
 	ErrEmptybody         = errors.New("empty response body")
+	ErrEmptyJSON200Data  = errors.New("empty json 200 data")
 	ErrEmptyHTTPResponse = errors.New("empty http response")
 	ErrJSONDefault       = errors.New("unknown error")
 )
@@ -84,7 +85,7 @@ func (d *DWHClient) GetTotalRelaysForPortalAppIDs(ctx context.Context, params Ge
 	}
 
 	// Handle non-200 error responses
-	if response.JSON200 == nil {
+	if response.JSON200 == nil || response.JSON200.Data == nil {
 		switch {
 		case response.JSON204 != nil:
 			return nil, ErrJSON204
@@ -96,6 +97,8 @@ func (d *DWHClient) GetTotalRelaysForPortalAppIDs(ctx context.Context, params Ge
 			return nil, ErrEmptybody
 		case response.HTTPResponse == nil:
 			return nil, ErrEmptyHTTPResponse
+		case response.JSON200.Data == nil:
+			return nil, ErrEmptyJSON200Data
 		case response.JSONDefault != nil:
 			return nil, ErrJSONDefault
 		}
