@@ -38,11 +38,7 @@ jobs:
         with:
           branches: |
             [
-              'main',
-              {
-                name: 'beta',
-                prerelease: 'rc'
-              },
+              'main'
             ]
           tag_format: "v${version}"
           additional_packages: |
