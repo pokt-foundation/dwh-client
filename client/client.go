@@ -7,7 +7,7 @@ import (
 	"time"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
-	"github.com/pokt-foundation/portal-db/v2/types"
+	"github.com/pokt-foundation/portal-http-db/v2/types"
 )
 
 const dwhAPIKeyHeader = "Portal-DWH-Service-Api-Key"

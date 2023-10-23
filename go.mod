@@ -6,7 +6,7 @@ require (
 	github.com/getkin/kin-openapi v0.120.0
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/oapi-codegen/runtime v1.0.0
-	github.com/pokt-foundation/portal-db/v2 v2.13.3
+	github.com/pokt-foundation/portal-http-db/v2 v2.4.1
 	github.com/stretchr/testify v1.8.4
 )
 
@@ -18,6 +18,7 @@ require (
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/invopop/yaml v0.2.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
