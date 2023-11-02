@@ -251,9 +251,23 @@ paths:
           in: query
           required: true
           schema:
-            type: array
-            items:
-              type: string
+            type: string
+        - name: page
+          in: query
+          description: Page number (starting from 1)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: page_size
+          in: query
+          description: Number of records per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 100
       responses:
         "200":
           description: OK
@@ -285,6 +299,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
 components:
   responses:
     Unauthorized:

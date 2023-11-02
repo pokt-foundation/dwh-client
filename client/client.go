@@ -13,7 +13,8 @@ import (
 const dwhAPIKeyHeader = "Portal-DWH-Service-Api-Key"
 
 var (
-	ErrNoPortalAppIDS = errors.New("no portal app ids provided")
+	ErrNoPortalAppIDs = errors.New("no portal app ids provided")
+	ErrNoAccountIDs   = errors.New("no account ids provided")
 	ErrNoDateRange    = errors.New("both from and to dates must be provided")
 
 	ErrJSON204           = errors.New("error 204: no content")
@@ -38,11 +39,16 @@ type (
 
 	IDWHClient interface {
 		GetTotalRelaysForPortalAppIDs(ctx context.Context, params GetTotalRelaysForPortalAppIDsParams) ([]AnalyticsRelaysTotal, error)
+		GetTotalRelaysForAccountIDs(ctx context.Context, params GetTotalRelaysForAccountIDsParams) ([]AnalyticsRelaysTotal, error)
 	}
 
 	GetTotalRelaysForPortalAppIDsParams struct {
 		From, To     time.Time
 		PortalAppIDs []types.PortalAppID
+	}
+	GetTotalRelaysForAccountIDsParams struct {
+		From, To   time.Time
+		AccountIDs []types.AccountID
 	}
 )
 
@@ -57,13 +63,13 @@ func NewDWHClient(config Config) (*DWHClient, error) {
 	return &DWHClient{client: dwhClient}, err
 }
 
-// GetTotalRelaysForPortalAppIDs returns the total relays for the given portal app ids.
+// GetTotalRelaysForPortalAppIDs returns the total relays for the given portal app IDs.
 func (d *DWHClient) GetTotalRelaysForPortalAppIDs(ctx context.Context, params GetTotalRelaysForPortalAppIDsParams) ([]AnalyticsRelaysTotal, error) {
 	if params.From.IsZero() || params.To.IsZero() {
 		return nil, ErrNoDateRange
 	}
 	if len(params.PortalAppIDs) == 0 {
-		return nil, ErrNoPortalAppIDS
+		return nil, ErrNoPortalAppIDs
 	}
 
 	portalAppIDStrs := []string{}
@@ -73,7 +79,66 @@ func (d *DWHClient) GetTotalRelaysForPortalAppIDs(ctx context.Context, params Ge
 
 	response, err := d.client.GetAnalyticsRelaysTotalCategoryWithResponse(
 		ctx,
-		"application_id",
+		GetAnalyticsRelaysTotalCategoryParamsCategoryApplicationId,
+		&GetAnalyticsRelaysTotalCategoryParams{
+			From:          openapi_types.Date{Time: params.From},
+			To:            openapi_types.Date{Time: params.To},
+			CategoryValue: portalAppIDStrs,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Handle non-200 error responses
+	if response.JSON200 == nil || response.JSON200.Data == nil {
+		switch {
+		case response.JSON204 != nil:
+			return nil, ErrJSON204
+		case response.JSON401 != nil:
+			return nil, ErrUnauthorized
+		case response.JSON404 != nil:
+			return nil, ErrNotFound
+		case response.Body == nil:
+			return nil, ErrEmptybody
+		case response.HTTPResponse == nil:
+			return nil, ErrEmptyHTTPResponse
+		case response.JSON200.Data == nil:
+			return nil, ErrEmptyJSON200Data
+		case response.JSONDefault != nil:
+			return nil, ErrJSONDefault
+		}
+	}
+
+	responseData := []AnalyticsRelaysTotal{}
+	for _, data := range *response.JSON200.Data {
+		analyticsRelaysTotal, err := data.AsAnalyticsRelaysTotal()
+		if err != nil {
+			return nil, err
+		}
+		responseData = append(responseData, analyticsRelaysTotal)
+	}
+
+	return responseData, nil
+}
+
+// GetTotalRelaysForAccountIDs returns the total relays for the given account IDs.
+func (d *DWHClient) GetTotalRelaysForAccountIDs(ctx context.Context, params GetTotalRelaysForAccountIDsParams) ([]AnalyticsRelaysTotal, error) {
+	if params.From.IsZero() || params.To.IsZero() {
+		return nil, ErrNoDateRange
+	}
+	if len(params.AccountIDs) == 0 {
+		return nil, ErrNoAccountIDs
+	}
+
+	portalAppIDStrs := []string{}
+	for _, portalAppID := range params.AccountIDs {
+		portalAppIDStrs = append(portalAppIDStrs, string(portalAppID))
+	}
+
+	response, err := d.client.GetAnalyticsRelaysTotalCategoryWithResponse(
+		ctx,
+		GetAnalyticsRelaysTotalCategoryParamsCategoryAccountId,
 		&GetAnalyticsRelaysTotalCategoryParams{
 			From:          openapi_types.Date{Time: params.From},
 			To:            openapi_types.Date{Time: params.To},
