@@ -14,19 +14,19 @@ type MockIDWHClient struct {
 }
 
 // GetTotalRelaysForAccountIDs provides a mock function with given fields: ctx, params
-func (_m *MockIDWHClient) GetTotalRelaysForAccountIDs(ctx context.Context, params GetTotalRelaysForAccountIDsParams) ([]AnalyticsRelaysTotal, error) {
+func (_m *MockIDWHClient) GetTotalRelaysForAccountIDs(ctx context.Context, params GetTotalRelaysForAccountIDsParams) ([]AccountRelaysTotal, error) {
 	ret := _m.Called(ctx, params)
 
-	var r0 []AnalyticsRelaysTotal
+	var r0 []AccountRelaysTotal
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, GetTotalRelaysForAccountIDsParams) ([]AnalyticsRelaysTotal, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, GetTotalRelaysForAccountIDsParams) ([]AccountRelaysTotal, error)); ok {
 		return rf(ctx, params)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, GetTotalRelaysForAccountIDsParams) []AnalyticsRelaysTotal); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, GetTotalRelaysForAccountIDsParams) []AccountRelaysTotal); ok {
 		r0 = rf(ctx, params)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]AnalyticsRelaysTotal)
+			r0 = ret.Get(0).([]AccountRelaysTotal)
 		}
 	}
 
@@ -40,19 +40,19 @@ func (_m *MockIDWHClient) GetTotalRelaysForAccountIDs(ctx context.Context, param
 }
 
 // GetTotalRelaysForPortalAppIDs provides a mock function with given fields: ctx, params
-func (_m *MockIDWHClient) GetTotalRelaysForPortalAppIDs(ctx context.Context, params GetTotalRelaysForPortalAppIDsParams) ([]AnalyticsRelaysTotal, error) {
+func (_m *MockIDWHClient) GetTotalRelaysForPortalAppIDs(ctx context.Context, params GetTotalRelaysForPortalAppIDsParams) ([]PortalAppRelaysTotal, error) {
 	ret := _m.Called(ctx, params)
 
-	var r0 []AnalyticsRelaysTotal
+	var r0 []PortalAppRelaysTotal
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, GetTotalRelaysForPortalAppIDsParams) ([]AnalyticsRelaysTotal, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, GetTotalRelaysForPortalAppIDsParams) ([]PortalAppRelaysTotal, error)); ok {
 		return rf(ctx, params)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, GetTotalRelaysForPortalAppIDsParams) []AnalyticsRelaysTotal); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, GetTotalRelaysForPortalAppIDsParams) []PortalAppRelaysTotal); ok {
 		r0 = rf(ctx, params)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]AnalyticsRelaysTotal)
+			r0 = ret.Get(0).([]PortalAppRelaysTotal)
 		}
 	}
 
