@@ -14,14 +14,13 @@ import (
 const dwhAPIKeyHeader = "Portal-DWH-Service-Api-Key"
 
 var (
-	ErrNoPortalAppIDs = errors.New("no portal app ids provided")
-	ErrNoDateRange    = errors.New("no date range provided")
-	ErrNoIDs          = errors.New("no ids provided for category type '%s")
+	ErrNoDateRange = errors.New("no date range provided. both 'from' and 'to' must be provided")
+	ErrNoIDs       = errors.New("no ids provided for category type '%s")
 
 	ErrJSON204           = errors.New("error 204: no content")
 	ErrUnauthorized      = errors.New("unauthorized access")
 	ErrNotFound          = errors.New("resource not found")
-	ErrEmptybody         = errors.New("empty response body")
+	ErrEmptyBody         = errors.New("empty response body")
 	ErrEmptyJSON200Data  = errors.New("empty json 200 data")
 	ErrEmptyHTTPResponse = errors.New("empty http response")
 	ErrJSONDefault       = errors.New("unknown error")
@@ -89,8 +88,8 @@ func NewDWHClient(config Config) (*DWHClient, error) {
 // GetTotalRelaysForPortalAppIDs returns the total relays for the given portal app IDs.
 func (d *DWHClient) GetTotalRelaysForPortalAppIDs(ctx context.Context, params GetTotalRelaysForPortalAppIDsParams) ([]PortalAppRelaysTotal, error) {
 	portalAppIDStrings := make([]string, len(params.PortalAppIDs))
-	for i, portalAppID := range params.PortalAppIDs {
-		portalAppIDStrings[i] = string(portalAppID)
+	for _, portalAppID := range params.PortalAppIDs {
+		portalAppIDStrings = append(portalAppIDStrings, string(portalAppID))
 	}
 
 	responseData, err := d.getTotalRelays(ctx, params.From, params.To, portalAppIDStrings, GetAnalyticsRelaysTotalCategoryParamsCategoryApplicationId)
@@ -109,8 +108,8 @@ func (d *DWHClient) GetTotalRelaysForPortalAppIDs(ctx context.Context, params Ge
 // GetTotalRelaysForAccountIDs returns the total relays for the given account IDs.
 func (d *DWHClient) GetTotalRelaysForAccountIDs(ctx context.Context, params GetTotalRelaysForAccountIDsParams) ([]AccountRelaysTotal, error) {
 	accountIDStrings := make([]string, len(params.AccountIDs))
-	for i, accountID := range params.AccountIDs {
-		accountIDStrings[i] = string(accountID)
+	for _, accountID := range params.AccountIDs {
+		accountIDStrings = append(accountIDStrings, string(accountID))
 	}
 
 	responseData, err := d.getTotalRelays(ctx, params.From, params.To, accountIDStrings, GetAnalyticsRelaysTotalCategoryParamsCategoryAccountId)
@@ -150,14 +149,14 @@ func (d *DWHClient) getTotalRelays(ctx context.Context, from, to time.Time, ids 
 		return nil, err
 	}
 
-	return d.parseResponse(response)
+	return parseResponse(response)
 }
 
 // parseResponse parses the response from the data warehouse client.
-func (d *DWHClient) parseResponse(response *GetAnalyticsRelaysTotalCategoryResponse) ([]AnalyticsRelaysTotal, error) {
+func parseResponse(response *GetAnalyticsRelaysTotalCategoryResponse) ([]AnalyticsRelaysTotal, error) {
 	// Handle non-200 error responses
 	if response.JSON200 == nil || response.JSON200.Data == nil {
-		return nil, d.handleNon200Response(response)
+		return nil, handleNon200Response(response)
 	}
 
 	var responseData []AnalyticsRelaysTotal
@@ -172,7 +171,7 @@ func (d *DWHClient) parseResponse(response *GetAnalyticsRelaysTotalCategoryRespo
 }
 
 // handleNon200Response handles non-200 error responses.
-func (d *DWHClient) handleNon200Response(response *GetAnalyticsRelaysTotalCategoryResponse) error {
+func handleNon200Response(response *GetAnalyticsRelaysTotalCategoryResponse) error {
 	switch {
 	case response.JSON204 != nil:
 		return ErrJSON204
@@ -181,7 +180,7 @@ func (d *DWHClient) handleNon200Response(response *GetAnalyticsRelaysTotalCatego
 	case response.JSON404 != nil:
 		return ErrNotFound
 	case response.Body == nil:
-		return ErrEmptybody
+		return ErrEmptyBody
 	case response.HTTPResponse == nil:
 		return ErrEmptyHTTPResponse
 	case response.JSON200.Data == nil:
