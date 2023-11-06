@@ -32,19 +32,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Tag
-        uses: codfish/semantic-release-action@v2.1.0
+      - name: Tag Semantic Release Version
         id: semantic
+        uses: cycjimmy/semantic-release-action@v4
         with:
           branches: |
             [
               'main'
             ]
-          tag_format: "v${version}"
-          additional_packages: |
-            ['@semantic-release/commit-analyzer']
-          plugins: |
-            ['@semantic-release/commit-analyzer']
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Go List
         if: steps.semantic.outputs.new-release-published == 'true'
