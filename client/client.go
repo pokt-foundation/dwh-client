@@ -87,7 +87,7 @@ func NewDWHClient(config Config) (*DWHClient, error) {
 
 // GetTotalRelaysForPortalAppIDs returns the total relays for the given portal app IDs.
 func (d *DWHClient) GetTotalRelaysForPortalAppIDs(ctx context.Context, params GetTotalRelaysForPortalAppIDsParams) ([]PortalAppRelaysTotal, error) {
-	portalAppIDStrings := make([]string, len(params.PortalAppIDs))
+	portalAppIDStrings := make([]string, 0, len(params.PortalAppIDs))
 	for _, portalAppID := range params.PortalAppIDs {
 		portalAppIDStrings = append(portalAppIDStrings, string(portalAppID))
 	}
@@ -107,7 +107,7 @@ func (d *DWHClient) GetTotalRelaysForPortalAppIDs(ctx context.Context, params Ge
 
 // GetTotalRelaysForAccountIDs returns the total relays for the given account IDs.
 func (d *DWHClient) GetTotalRelaysForAccountIDs(ctx context.Context, params GetTotalRelaysForAccountIDsParams) ([]AccountRelaysTotal, error) {
-	accountIDStrings := make([]string, len(params.AccountIDs))
+	accountIDStrings := make([]string, 0, len(params.AccountIDs))
 	for _, accountID := range params.AccountIDs {
 		accountIDStrings = append(accountIDStrings, string(accountID))
 	}
