@@ -18,16 +18,17 @@ jobs:
 
       - name: Tag Semantic Release Version
         id: semantic
-        uses: cycjimmy/semantic-release-action@v4
+        uses: codfish/semantic-release-action@v3
         with:
           branches: |
             [
               'main'
             ]
-          extra_plugins: |
-            @semantic-release/commit-analyzer
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag-format: "v${version}"
+          additional-packages: |
+            ['@semantic-release/commit-analyzer']
+          plugins: |
+            ['@semantic-release/commit-analyzer']
 
       - name: Set up Go
         uses: actions/setup-go@v4
